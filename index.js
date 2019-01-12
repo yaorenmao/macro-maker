@@ -231,103 +231,7 @@ module.exports = function Macro(dispatch) {
 			switch (x) {
 /*Set Class*/	case 'class':	// Set current class
 					if(y==undefined){say("!ar class [class]", "#FF00FF");break;}
-					switch (y) {
-						//RANGE
-						case 'sorc':
-						case 'sorcerer':
-							cClass=sorcerer;
-							cRot="r"+sorcerer;
-							config[settings][0]=sorcerer;
-							say("Class is set to "+sorcerer+"","#AA00FF");
-						break;
-						case 'arch':
-						case 'archer':
-							cClass=archer;
-							cRot="r"+archer;
-							config[settings][0]=archer;
-							say("Class is set to "+archer+"","#AA00FF");
-						break;
-						case 'gun':
-						case 'gunner':
-							cClass=gunner;
-							cRot="r"+gunner;
-							config[settings][0]=gunner;
-							say("Class is set to "+gunner+"","#AA00FF");
-						break;
-						//HEAL
-						case 'myst':
-						case 'mystic':
-							cClass=mystic;
-							cRot="r"+mystic;
-							config[settings][0]=mystic;
-							say("Class is set to "+mystic+"","#AA00FF");
-						break;
-						case 'priest':
-							cClass=priest;
-							cRot="r"+priest;
-							config[settings][0]=priest;
-							say("Class is set to "+priest+"","#AA00FF");
-						break;
-						//TANK
-						case 'lanc':
-						case 'lancer':
-							cClass=lancer;
-							cRot="r"+lancer;
-							config[settings][0]=lancer;
-							say("Class is set to "+lancer+"","#AA00FF");
-						break;
-						case 'brawl':
-						case 'brawler':
-							cClass=brawler;
-							cRot="r"+brawler;
-							config[settings][0]=brawler;
-							say("Class is set to "+brawler+"","#AA00FF");
-						break;
-						case 'war':
-						case 'warrior':
-							cClass=priest;
-							cRot="r"+priest;
-							config[settings][0]=priest;
-							say("Class is set to "+priest+"","#AA00FF");
-						break;
-						case 'zerk':
-						case 'berserker':
-							cClass=berserker;
-							cRot="r"+berserker;
-							config[settings][0]=berserker;
-							say("Class is set to "+berserker+"","#AA00FF");
-						break;
-						//MEELEE
-						case 'ninja':
-							cClass=ninja;
-							cRot="r"+ninja;
-							config[settings][0]=ninja;
-							say("Class is set to "+ninja+"","#AA00FF");
-						break;
-						case 'reaper':
-							cClass=reaper;
-							cRot="r"+reaper;
-							config[settings][0]=reaper;
-							say("Class is set to "+reaper+"","#AA00FF");
-						break;
-						case 'valk':
-						case 'valkyrie':
-							cClass=valk;
-							cRot="r"+valk;
-							config[settings][0]=valk;
-							say("Class is set to "+valk+"","#AA00FF");
-						break;
-						case 'slayer':
-							cClass=slayer;
-							cRot="r"+slayer;
-							config[settings][0]=slayer;
-							say("Class is set to "+slayer+"","#AA00FF");
-						break;
-						default:
-							say("Unknown Class","#FF0000");
-						break;
-					}
-					saveConfig();
+					setClass(y);
 				break;
 				case 'time':	// Show time Between 2 events
 					if(y==undefined||z==undefined){say("!ar time [time2] [time1]", "#FF00FF");break;}
@@ -780,7 +684,6 @@ clr("#FF00FF","Commands:\n")+clr("#00FF00","ar  ")+clr("#FF0000","Mod on/off\n")
 +clr("#00FF00","auro help  ")+clr("#FF0000","instructions\n")
 +clr("#00FF00","auro macro  ")+clr("#FF0000","show Macro commands\n")
 +clr("#00FF00","auro skill  ")+clr("#FF0000","show Skills commands\n")
-+clr("#00FF00","ar class ")+clr("#FF00FF","[class]  ")+clr("#FF0000","set current class\n")
 +clr("#00FF00","auro debug  ")+clr("#FF0000","Display skill/effects info on/off\n")
 +clr("#00FF00","auro abn  ")+clr("#FF0000","Display Abnormality on/off\n")
 +clr("#00FF00","ar catch  ")+clr("#FF0000","Catch ID and Type of skill\n")
@@ -814,7 +717,7 @@ clr("#00FF00","ar mnew ")+clr("#FFFF00","[Triggering skill id] [Name] [Triggerin
 		}else if(x=='info' ||x=='help'){
 dispatch.command.message(clr("#FF00FF","How to create macro:\n")
 +clr("#FF00FF","1 > ")+clr("#00FF00","Enable Mod(command: ")+clr("#FF0000","!ar")
-+clr("#00FF00",")\n")+clr("#00FF00","Set class: ")+clr("#FF0000","!ar class ")+clr("#FF7700","[class]\n")
++clr("#00FF00",")\n")
 +clr("#FF00FF","2 > ")+clr("#FF0000","!ar catch ")+clr("#00FF00","Now cast skill you want to use as Macro trigger\n")
 +clr("#FF00FF","3 > ")+clr("#FF0000","!ar mnew ")+clr("#FF7700","cat Nyan cat 0\n")+clr("#00FF00","Here we Created new Macro with name ")+clr("#FF7700","Nyan ")+clr("#00FF00","and with catched(")+clr("#FF7700","cat")+clr("#00FF00",") ID and Type of skill\n")
 +clr("#FF00FF","4 > ")
@@ -889,6 +792,64 @@ dispatch.command.message(clr("#FF00FF","How to create macro:\n")
 		}else{return 0;}
 	}
 	
+	function setClass(x){
+		switch (x) {
+//# warrior = 0, lancer = 1, slayer = 2, berserker = 3,
+//# sorcerer = 4, archer = 5, priest = 6, mystic = 7,
+//# reaper = 8, gunner = 9, brawler = 10, ninja = 11,
+//# valkyrie = 12
+			case 4:
+				forSetClass(sorcerer);
+			break;
+			case 5:
+				forSetClass(archer);
+			break;
+			case 9:
+				forSetClass(gunner);
+			break;
+			//HEAL
+			case 7:
+				forSetClass(mystic);
+			break;
+			case 6:
+				forSetClass(priest);
+			break;
+			//TANK
+			case 1:
+				forSetClass(lancer);
+			break;
+			case 10:
+				forSetClass(brawler);
+			break;
+			case 0:
+				forSetClass(priest);
+			break;
+			case 3:
+				forSetClass(berserker);
+			break;
+			//MEELEE
+			case 11:
+				forSetClass(ninja);
+			break;
+			case 8:
+				forSetClass(reaper);
+			break;
+			case 12:
+				forSetClass(valk);
+			break;
+			case 2:
+				forSetClass(slayer);
+			break;
+			default:
+				setTimeout(() => {say("Unknown Class, Something Wrong \(O_o)/","#FF0000");
+			},15000);//15 sec after login
+			break;
+		}
+		saveConfig();
+	}
+	function forSetClass(cl){
+		cClass=cl;cRot="r"+cl;config[settings][0]=cl;
+	}
 	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	//EVENTS////EVENTS////EVENTS////EVENTS////EVENTS////EVENTS////EVENTS////EVENTS////EVENTS////EVENTS////EVENTS//
 	//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -1003,8 +964,7 @@ dispatch.command.message(clr("#FF00FF","How to create macro:\n")
 	
     dispatch.hook('S_LOGIN', 10, ONLY_USER_HOOK, event => {
         model = event.templateId;//used to get player class
-        //job = (model - 10101) % 100;
-        //enabled = [JOB_ZERK].includes(job);
+		setClass((model - 10101) % 100);
     });
 	
 	//###################################################################################################################
