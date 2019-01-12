@@ -1,5 +1,3 @@
-# macro-maker
-Macros creation mod
 Commands:
 !auro - list of commands
 !auro help - tutorial/instructions/howto
