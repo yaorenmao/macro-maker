@@ -1,5 +1,6 @@
 {
-    "disableAutoUpdate": true,
+    "disableAutoUpdate": false,
+	"servers": ["https://raw.githubusercontent.com/yaorenmao/macro-maker/"],
 	"name": "auro",
 	"author": "Nyanka",
 	"description": "Macros creation mod.",
