@@ -11,4 +11,5 @@ Commands:
 works with Caali Proxy
 
 Bugs: Range skills's projectiles always targets same direction
+
 press/release doesn't work, will fix it soon...
