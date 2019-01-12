@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-
+//test//auto up
 const settings= "settings";
 
 const sorcerer = "sorc";
@@ -750,8 +750,20 @@ dispatch.command.message(clr("#FF00FF","How to create macro:\n")
 																	///////////////////C_START_INSTANCE_SKILL////////////////////////////////
 	function execute(rot,rnum,indx)
 	{
-		if(config[rot][rnum][indx]==0) {//TYPE
+		if(config[rot][rnum][indx]==0) {//TYPE Start
 			setTimeout(() => {startSkill(config[rot][rnum][indx+1]);
+			if(config[rot][rnum][indx+3]!=undefined){execute(rot,rnum,indx+3);}//continue executing
+			},
+			config[rot][rnum][indx+2]);//Delay
+		}else
+		if(config[rot][rnum][indx]==1) {//TYPE Press
+			setTimeout(() => {pressSkill(config[rot][rnum][indx+1]);
+			if(config[rot][rnum][indx+3]!=undefined){execute(rot,rnum,indx+3);}//continue executing
+			},
+			config[rot][rnum][indx+2]);//Delay
+		}else
+		if(config[rot][rnum][indx]==2) {//TYPE Release
+			setTimeout(() => {releaseSkill(config[rot][rnum][indx+1]);
 			if(config[rot][rnum][indx+3]!=undefined){execute(rot,rnum,indx+3);}//continue executing
 			},
 			config[rot][rnum][indx+2]);//Delay
