@@ -1,0 +1,11 @@
+{
+    "disableAutoUpdate": true,
+	"name": "auro",
+	"author": "Nyanka",
+	"description": "Macros creation mod.",
+	"options": {
+		"guiName": "Auro",
+		"reloadable": true,
+		"niceName": "Auro"
+	}
+}

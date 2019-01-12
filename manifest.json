@@ -1,0 +1,10 @@
+{
+	"files": {
+		"index.js": "44bc8c11b67d67ef591a4527462af7cff8a8aecfcabbffafd12496c178b794f5"
+	},
+	"defs": {
+		"C_PLAYER_LOCATION": 5,
+		"C_PRESS_SKILL": 4,
+		"C_START_SKILL": 7
+	}
+}
