@@ -1,10 +1,25 @@
 {
-	"files": {
-		"index.js": "44bc8c11b67d67ef591a4527462af7cff8a8aecfcabbffafd12496c178b794f5"
-	},
-	"defs": {
-		"C_PLAYER_LOCATION": 5,
-		"C_PRESS_SKILL": 4,
-		"C_START_SKILL": 7
-	}
+    "files": {
+        "README.md": "e11c80fd909ba36d707534810d80e090f237c299c4adf38b5d0fe2824853f633",
+        "config.json": "89996946427de737bd8a8220a568bbf16449a1903cfe9a0f46afc227043739f7",
+        "index.js": "cac7cd0371376da5a368b2b97f8fdef1d1c8ad838ecfb35e02c398c1873b0a0b",
+        "module.json": "54345fb1d1ddfe9d00153499683cfc74e11cbedffbf02a500402ed36a7f8c97e"
+    },
+    "defs": {
+        "C_PLAYER_LOCATION": 5,
+        "C_PRESS_SKILL": 4,
+        "C_START_INSTANCE_SKILL": 5,
+        "C_START_SKILL": 7,
+        "C_START_TARGETED_SKILL": 6,
+        "C_USE_ITEM": 3,
+        "S_ABNORMALITY_BEGIN": 3,
+        "S_ABNORMALITY_END": 1,
+        "S_ACTION_END": 5,
+        "S_ACTION_STAGE": 8,
+        "S_CANNOT_START_SKILL": 4,
+        "S_EACH_SKILL_RESULT": 12,
+        "S_LOGIN": 10,
+        "S_PLAYER_STAT_UPDATE": 10,
+        "S_START_COOLTIME_SKILL": 3
+    }
 }

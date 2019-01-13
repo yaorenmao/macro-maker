@@ -19,15 +19,28 @@ const ninja = "ninja";
 const reaper = "reaper";
 const valk = "valk";
 const slayer = "slayer";
+// COLORS //cr cg cb cdb clb/cy co/ cp clp /cv /cbl cgr cw
+const cr = '</font><font color="#ff0000">';//RED
+const cg = '</font><font color="#00ff00">';//GREEN
+const cdb = '</font><font color="#2727ff">';//DARK BLUE
+
+const cy = '</font><font color="#ffff00">';//YELLOW
+const cp = '</font><font color="#ff00ff">';//PINK
+const clp = '</font><font color="#ff77ff">';//LIGHT PINK
+const clb = '</font><font color="#00ffff">';//LIGHT BLUE
+
+const co = '</font><font color="#ff7700">';//ORANGE
+const cb = '</font><font color="#0077ff">';//BLUE
+const cv = '</font><font color="#7700ff">';//VIOLET
+
+const cbl = '</font><font color="#000000">';//BLACK
+const cgr = '</font><font color="#777777">';//GRAY
+const cw = '</font><font color="#ffffff">';//WHITE
 
 const { Readable, Writeable } = require('tera-data-parser/lib/protocol/stream');
 const ONLY_USER_HOOK = {order: -1000000, filter: {fake: false}};
 
 module.exports = function Macro(dispatch) {
-	//From old module
-	let blockDelay = 10;
-	let setDelay = 130;
-	
 	//info for funnctions
 	let gameId=dispatch.game.me.gameId;
 	let model; //used to get player class //can be undefined after Hot-Reload
@@ -221,7 +234,7 @@ module.exports = function Macro(dispatch) {
 	//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX
 	
 	// Constructive command
-	dispatch.command.add('ar', (x, y, z, a, b, c, d) => {
+	dispatch.command.add('ar', (x, y, z, a, b, c, e) => {
 		if(x==undefined){
 			enabled = !enabled;say("Macros " + (enabled ? 'Activated':'Deactivated'), "#FF00FF");
 			config[settings][1]=(enabled ? true : false);saveConfig();
@@ -229,12 +242,11 @@ module.exports = function Macro(dispatch) {
 			
 			// Commands
 			switch (x) {
-/*Set Class*/	case 'class':	// Set current class
-					if(y==undefined){say("!ar class [class]", "#FF00FF");break;}
-					setClass(y);
+/*Color Test*/	case 'color':
+					say(cr+"\nRED COLOR"+cg+"\nGREEN COLOR"+cdb+"\nDARK BLUE COLOR"+cy+"\nYELLOW COLOR"+cp+"\nPINK COLOR"+clp+"\nLIGHT PINK COLOR"+clb+"\nLIGHT BLUE COLOR"+co+"\nORANGE COLOR"+cb+"\nBLUE COLOR"+cv+"\nVIOLET COLOR"+cbl+"\nBLACK COLOR"+cgr+"\nGRAY COLOR"+cw+"\nWHITE COLOR");
 				break;
 				case 'time':	// Show time Between 2 events
-					if(y==undefined||z==undefined){say("!ar time [time2] [time1]", "#FF00FF");break;}
+					if(y==undefined||z==undefined){say(cp+"!ar time "+cy+"[time2] [time1]");break;}
 					elapsed(y, z);
 				break;
 				case 'catch':	// Catch skill id and type
@@ -675,38 +687,37 @@ module.exports = function Macro(dispatch) {
 		}
 	});
 	
-	function clr(col,tex){return tex='<font color="' + col + '">' + tex + '</font>';}
-	
 	dispatch.command.add('auro', (x) => {
-		if(x==undefined){
+		if(x==undefined){//cr cg cb cdb clb/cy co/ cp clp /cv /cbl cgr cw
 dispatch.command.message(
-clr("#FF00FF","Commands:\n")+clr("#00FF00","ar  ")+clr("#FF0000","Mod on/off\n")
-+clr("#00FF00","auro help  ")+clr("#FF0000","instructions\n")
-+clr("#00FF00","auro macro  ")+clr("#FF0000","show Macro commands\n")
-+clr("#00FF00","auro skill  ")+clr("#FF0000","show Skills commands\n")
-+clr("#00FF00","auro debug  ")+clr("#FF0000","Display skill/effects info on/off\n")
-+clr("#00FF00","auro abn  ")+clr("#FF0000","Display Abnormality on/off\n")
-+clr("#00FF00","ar catch  ")+clr("#FF0000","Catch ID and Type of skill\n")
-+clr("#00FF00","ar time ")+clr("#FF00FF","[x] [y]  ")+clr("#FF0000","Time = (x - y)")
+cp+"Commands:\n"
++cg+"ar  "+cr+"Mod on/off\n"
++cg+"auro help  "+cr+"instructions\n"
++cg+"auro macro  "+cr+"show Macro commands\n"
++cg+"auro skill  "+cr+"show Skills commands\n"
++cg+"auro debug  "+cr+"Display skill/effects info on/off\n"
++cg+"auro abn  "+cr+"Display Abnormality on/off\n"
++cg+"ar catch  "+cr+"Catch ID and Type of skill\n"
++cg+"ar time "+cp+"[x] [y]  "+cr+"Time = (x - y)"
 );
 		}else if(x=='skill'){say("only Skills arguments Name and ID is used for displaying Names of skills instead of ID, other arguments currently completly useless and can be set to 0.","#FF0000");
-dispatch.command.message(clr("#FF00FF","If you catched skill - type ")+clr("#00FF00","cat ")+clr("#FF00FF","instead of ID and Type\n")
-+clr("#00FF00","ar snew ")+clr("#FFFF00","[id] [name] [type] [priority] [cast time] [cd]  ")+clr("#FF0000","Write info about skill in config\n")
-+clr("#00FF00","ar sedit ")+clr("#FFFF00","[id] [name] [type] [priority] [cast time] [cd]  ")+clr("#FF0000","Edit by ID, use \"-\" to skip arguments\n")
-+clr("#00FF00","ar slist  ")+clr("#FF0000","Lists all skills in config for current class")
+dispatch.command.message(cp+"If you catched skill - type "+cg+"cat "+cp+"instead of ID and Type\n"
++cg+"ar snew "+cy+"[id] [name] [type] [priority] [cast time] [cd]  "+cr+"Write info about skill in config\n"
++cg+"ar sedit "+cy+"[id] [name] [type] [priority] [cast time] [cd]  "+cr+"Edit by ID, use \"-\" to skip arguments\n"
++cg+"ar slist  "+cr+"Lists all skills in config for current class"
 );
 		}else if(x=='macro'){
 dispatch.command.message(
-clr("#00FF00","ar mnew ")+clr("#FFFF00","[Triggering skill id] [Name] [Triggering Type] [ISRepeat]  ")+clr("#FF0000","Creates new Macro\n")
-+clr("#00FF00","ar medit ")+clr("#FFFF00","[Triggering skill id] [Name] [Triggering Type] [ISRepeat]  ")+clr("#FF0000","Edit by Name, use [-] to skip argument)\n")
-+clr("#00FF00","ar mname ")+clr("#FFFF00","[old name] [new name]  ")+clr("#FF0000","Rename Macro\n")
-+clr("#00FF00","ar mdel ")+clr("#FFFF00","[name]  ")+clr("#FF0000","Delete Macro\n")
-+clr("#00FF00","ar madd ")+clr("#FFFF00","[Name] [Triggering Type] [ID] [Delay]  ")+clr("#FF0000","Add Action to Macro\n")
-+clr("#00FF00","ar maddedit ")+clr("#FFFF00","[Name] [Triggering Type] [ID] [Delay] [index]  ")+clr("#FF0000","use [-] to skip argument\n")
-+clr("#00FF00","ar madddel ")+clr("#FFFF00","[name] [index]  ")+clr("#FF0000","Delete Macro Action at Index\n")
-+clr("#00FF00","ar mlist  ")+clr("#FF0000","Lists all macros in config for current class\n")
-+clr("#00FF00","ar minfo ")+clr("#FFFF00","[name]  ")+clr("#FF0000","Show Macro Actions\n")
-+clr("#00FF44","auro mnewinfo ")+clr("#FF0000","mnew arguments info")
+cg+"ar mnew "+cy+"[Triggering skill id] [Name] [Triggering Type] [ISRepeat]  "+cr+"Creates new Macro\n"
++cg+"ar medit "+cy+"[Triggering skill id] [Name] [Triggering Type] [ISRepeat]  "+cr+"Edit by Name, use [-] to skip argument\n"
++cg+"ar mname "+cy+"[old name] [new name]  "+cr+"Rename Macro\n"
++cg+"ar mdel "+cy+"[name]  "+cr+"Delete Macro\n"
++cg+"ar madd "+cy+"[Name] [Triggering Type] [ID] [Delay]  "+cr+"Add Action to Macro\n"
++cg+"ar maddedit "+cy+"[Name] [Triggering Type] [ID] [Delay] [index]  "+cr+"use [-] to skip argument\n"
++cg+"ar madddel "+cy+"[name] [index]  "+cr+"Delete Macro Action at Index\n"
++cg+"ar mlist  "+cr+"Lists all macros in config for current class\n"
++cg+"ar minfo "+cy+"[name]  "+cr+"Show Macro Actions\n"
++cg+"auro mnewinfo "+cr+"mnew arguments info"
 );
 		}else if(x=='abn'){
 			abnorm = !abnorm;say("Abnormality Display: " + (abnorm ? 'Enabled':'Disabled'),"#FF00FF");
@@ -715,18 +726,20 @@ clr("#00FF00","ar mnew ")+clr("#FFFF00","[Triggering skill id] [Name] [Triggerin
 			testmode = !testmode;say("Debug Messages Display: " + (testmode ? 'Enabled':'Disabled'),"#FF00FF");
 			config[settings][2]=(testmode ? true : false);saveConfig();
 		}else if(x=='info' ||x=='help'){
-dispatch.command.message(clr("#FF00FF","How to create macro:\n")
-+clr("#FF00FF","1 > ")+clr("#00FF00","Enable Mod(command: ")+clr("#FF0000","!ar")
-+clr("#00FF00",")\n")
-+clr("#FF00FF","2 > ")+clr("#FF0000","!ar catch ")+clr("#00FF00","Now cast skill you want to use as Macro trigger\n")
-+clr("#FF00FF","3 > ")+clr("#FF0000","!ar mnew ")+clr("#FF7700","cat Nyan cat 0\n")+clr("#00FF00","Here we Created new Macro with name ")+clr("#FF7700","Nyan ")+clr("#00FF00","and with catched(")+clr("#FF7700","cat")+clr("#00FF00",") ID and Type of skill\n")
-+clr("#FF00FF","4 > ")
-+clr("#00FF00","To get skill cast time - enable skills info - ")+clr("#FF0000","!auro debug\n")
-+clr("#FF00FF","5 > ")+clr("#00FF00","Now again cast skill you used as trigger, and after - cast any other skill as fast, as possible\n")
-+clr("#FF00FF","6 > ")+clr("#00FF00","You will see message like this:\n")+clr("#0077FF","T4: C_START_SKILL... \n")
-+clr("#00FF00","Digit (")+clr("#0077FF","4 ")+clr("#00FF00","in our example) will be used to get time from 1st to 2nd Skill cast: ")+clr("#FF0000","!ar time ")+clr("#FFFF00","[2nd] [1st]\n")
-+clr("#FF00FF","7 > ")+clr("#00FF00","Catch 2nd Skill: ")+clr("#FF0000","!ar catch ")+clr("#00FF00","Now use ")+clr("#0077FF","Time")+clr("#00FF00"," you got at ")+clr("#FF00FF","step 6 ")+clr("#00FF00","as Delay to Add Action to your Macro: ")+clr("#FF0000","!ar madd ")+clr("#FF7700","Nyan cat cat ")+clr("#0077FF","Time\n")
-+clr("#00FF00","Now try to trigger your skill. If you did all right - you will see 2nd skill Activating. If 2nd hit too early - increace ")+clr("#0077FF","Time")+clr("#00FF00",", or decreace if you want. This way you can add as many Skills as you want and see all things you added by using command ")+clr("#FF0000","!ar minfo ")+clr("#00FF00","and ")+clr("#FF0000","!ar mlist")
+dispatch.command.message(cp+"How to create macro:\n"
++cp+"1 > "+cg+"Enable Mod(command: "+cr+"!ar"
++cg+")\n"
++cp+"2 > "+cr+"!ar catch "+cg+"Now cast skill you want to use as Macro trigger\n"
++cp+"3 > "+cr+"!ar mnew "+co+"cat Nyan cat 0\n"
++cg+"Here we Created new Macro with name "+co+"Nyan "+cg+"and with catched("+co+"cat"+cg+") ID and Type of skill\n"
++cp+"4 > "
++cg+"To get skill cast time - enable skills info - "+cr+"!auro debug\n"
++cp+"5 > "+cg+"Now again cast skill you used as trigger, and after - cast any other skill as fast, as possible\n"
++cp+"6 > "+cg+"You will see message like this:\n"
++cb+"T4: C_START_SKILL... \n"
++cg+"Digit ("+cb+"4 "+cg+"in our example) will be used to get time from 1st to 2nd Skill cast: "+cr+"!ar time "+cy+"[2nd] [1st]\n"
++cp+"7 > "+cg+"Catch 2nd Skill: "+cr+"!ar catch "+cg+"Now use "+cb+"Time"+cg+" you got at "+cp+"step 6 "+cg+"as Delay to Add Action to your Macro: "+cr+"!ar madd "+co+"Nyan cat cat "+cb+"Time\n"
++cg+"Now try to trigger your skill. If you did all right - you will see 2nd skill Activating. If 2nd hit too early - increace "+cb+"Time"+cg+", or decreace if you want. This way you can add as many Skills as you want and see all things you added by using command "+cr+"!ar minfo "+cg+"and "+cr+"!ar mlist"
 );
 		}else if(x=='mnewinfo'){
 					say("mnew x = skill that trigger Macro\n"+
@@ -747,7 +760,7 @@ dispatch.command.message(clr("#FF00FF","How to create macro:\n")
 					, "#FF00FF");
 		}
 	});
-																	///////////////////C_START_INSTANCE_SKILL////////////////////////////////
+																	///////////////////C_START_INSTANCE_SKILL////////////////////////////////S_CANNOT_START_SKILL.4/////////////////////////////////////
 	function execute(rot,rnum,indx)
 	{
 		if(config[rot][rnum][indx]==0) {//TYPE Start
@@ -773,7 +786,7 @@ dispatch.command.message(clr("#FF00FF","How to create macro:\n")
 	// Core Event | a=skill ID, b=event type[0=Start,1=Press,2=Release,3=ActionStage,4=ActionEnd,5=EachSkilResu,6=AbnBeg, 7=AbnEnd,8=StartCooldown], c=optional_parameter
 	function eve(a, b=undefined, c=undefined)	//Events from Hooks
 	{
-		if(isCatch){isCatch=false;catId=a;catType=b;say("Skill with id "+a+" and type "+b+" Catched!","#FF00FF");}
+		if(isCatch){isCatch=false;catId=a;catType=b;say(cb+"cat"+cp+"ched! Id "+cb+a+cp+", Type "+cb+b);}
 		if(bait)
 		{
 			for(let i=0;i<config[cRot].length;i++)// i=index rotacii, i[0]=triggering skill
@@ -889,6 +902,20 @@ dispatch.command.message(clr("#FF00FF","How to create macro:\n")
 		if (enabled){eve(event.skill.id, (event.press ? 1 : 2));	getTime();
 			debug('T'+timeid+': C_PRESS_SKILL(User) ' + (event.press ? '\"P\"' : '\"R\"') + ': ' + event.skill.id, "#0077FF");}
 	});
+	
+	
+	// Called when????????????????? C_START_TARGETED_SKILL
+	dispatch.hook('C_START_TARGETED_SKILL', 6, ONLY_USER_HOOK, event => {
+		if(enabled){eve(event.skill,668);getTime();debug(cr+'T'+timeid+': C_START_TARGETED_SKILL(User): ' + event.skill);}
+    });
+	// Called when????????????????? C_START_TARGETED_SKILL
+	dispatch.hook('C_START_INSTANCE_SKILL', 5, ONLY_USER_HOOK, event => {
+		if(enabled){eve(event.skill,666);getTime();debug(cr+'T'+timeid+': C_START_INSTANCE_SKILL(User): ' + event.skill);}
+    });
+	// Called when?????????????????
+	dispatch.hook('S_CANNOT_START_SKILL', 4, ONLY_USER_HOOK, event => {
+		if(enabled){eve(event.skill,667);getTime();debug(cr+'T'+timeid+': S_CANNOT_START_SKILL(User): ' + event.skill);}
+    });
 	
 	// Called when??? can i use it to disable or fake anything?..
     dispatch.hook('S_ACTION_STAGE', 8, event => { //, {order: -1000000, filter: {fake: null}} //to hook only crafted

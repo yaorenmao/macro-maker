@@ -10,6 +10,4 @@ Commands:
 
 works with Caali Proxy
 
-Bugs: Range skills's projectiles always targets same direction
-
-Autoupdate doesn't work
+Bugs: started by macros Range skills's projectiles always targets same direction

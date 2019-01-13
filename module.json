@@ -1,12 +1,12 @@
 {
     "disableAutoUpdate": false,
-	"servers": ["https://raw.githubusercontent.com/yaorenmao/macro-maker/master/"],
-	"name": "auro",
-	"author": "Nyanka",
-	"description": "Macros creation mod.",
-	"options": {
-		"guiName": "Auro",
-		"reloadable": true,
-		"niceName": "Auro"
-	}
+    "servers": ["https://raw.githubusercontent.com/yaorenmao/macro-maker/master/"],
+    "name": "auro",
+    "author": "Nyanka",
+    "description": "Macros creation mod.",
+    "options": {
+        "guiName": "Auro",
+        "reloadable": true,
+        "niceName": "Auro"
+    }
 }
