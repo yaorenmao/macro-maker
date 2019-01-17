@@ -928,7 +928,7 @@ dispatch.command.message(cp+"How to create macro:\n"
 	
 	// Called when item used
 	dispatch.hook('C_USE_ITEM', 3, event => {
-		if(enabled && (event.id==206004 || event.id==206003 || event.id==206002 || event.id==206001 || event.id==206000 || event.id==206005 || event.id==206006 || event.id==206007 || event.id==206008 || event.id==206009))
+		if(false && enabled && (event.id==206004 || event.id==206003 || event.id==206002 || event.id==206001 || event.id==206000 || event.id==206005 || event.id==206006 || event.id==206007 || event.id==206008 || event.id==206009))
 		{
 			if(event.id==206004 || event.id==206003 || event.id==206002 || event.id==206001 || event.id==206000){
 				lpa=false;
