@@ -1,12 +1,12 @@
 Commands:
 
-!auro - list of commands
+!macro - list of commands
 
-!auro help - tutorial/instructions/howto
+!macro help - tutorial/instructions/howto
 
-!ar - on/off
+!mm - on/off
 
-!auro debug - disable/enable skills info
+!macro debug - disable/enable skills info
 
 works with Caali Proxy
 

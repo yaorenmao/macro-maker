@@ -1,12 +1,12 @@
 {
     "files": {
-        "README.md": "e11c80fd909ba36d707534810d80e090f237c299c4adf38b5d0fe2824853f633",
-        "index.js": "cac7cd0371376da5a368b2b97f8fdef1d1c8ad838ecfb35e02c398c1873b0a0b",
-        "module.json": "54345fb1d1ddfe9d00153499683cfc74e11cbedffbf02a500402ed36a7f8c97e"
+        "README.md": "00482c1e5c41a92454061413a5bdc6fb8e8ff985535a5316db2686db9a3403ff",
+        "index.js": "ddd084023cf73b316a5f423c35883b807eda379ca527ebc851ab8236b2b5f4e7"
     },
     "defs": {
         "C_PLAYER_LOCATION": 5,
         "C_PRESS_SKILL": 4,
+        "C_START_COMBO_INSTANT_SKILL": 4,
         "C_START_INSTANCE_SKILL": 5,
         "C_START_SKILL": 7,
         "C_START_TARGETED_SKILL": 6,

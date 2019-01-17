@@ -36,11 +36,32 @@ const cv = '</font><font color="#7700ff">';//VIOLET
 const cbl = '</font><font color="#000000">';//BLACK
 const cgr = '</font><font color="#777777">';//GRAY
 const cw = '</font><font color="#ffffff">';//WHITE
+//EVENT TYPES
+const cstart =0;
+const cpress =1;
+const crelease =2;
+
+const ld=0;//lanc delay
+const lb=20200;
+const lba=181100;
+const lba2=181101;
+const laa=11200;
+const laa2=11201;
+const laa3=11202;
 
 const { Readable, Writeable } = require('tera-data-parser/lib/protocol/stream');
 const ONLY_USER_HOOK = {order: -1000000, filter: {fake: false}};
 
 module.exports = function Macro(dispatch) {
+		let lad=50;
+		let lbd=90;
+		let lpa=false;//pause lancer script by block
+		let laDodge=false;//lancer dodge
+		let lc=0;
+		let eTarget=0;
+		let targets;
+		let endpoints;
+		let fakeS=false;
 	//info for funnctions
 	let gameId=dispatch.game.me.gameId;
 	let model; //used to get player class //can be undefined after Hot-Reload
@@ -83,7 +104,7 @@ module.exports = function Macro(dispatch) {
 	let timeid=0;
 	
 	//Core
-	let bait = true; // Default - Auro enabled // Not used..
+	let bait = false; // Default - macro enabled // Not used..
 	
 	
 	//Config
@@ -234,7 +255,7 @@ module.exports = function Macro(dispatch) {
 	//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX//XXXXXXXXXX
 	
 	// Constructive command
-	dispatch.command.add('ar', (x, y, z, a, b, c, e) => {
+	dispatch.command.add('mm', (x, y, z, a, b, c, d) => {
 		if(x==undefined){
 			enabled = !enabled;say("Macros " + (enabled ? 'Activated':'Deactivated'), "#FF00FF");
 			config[settings][1]=(enabled ? true : false);saveConfig();
@@ -246,21 +267,40 @@ module.exports = function Macro(dispatch) {
 					say(cr+"\nRED COLOR"+cg+"\nGREEN COLOR"+cdb+"\nDARK BLUE COLOR"+cy+"\nYELLOW COLOR"+cp+"\nPINK COLOR"+clp+"\nLIGHT PINK COLOR"+clb+"\nLIGHT BLUE COLOR"+co+"\nORANGE COLOR"+cb+"\nBLUE COLOR"+cv+"\nVIOLET COLOR"+cbl+"\nBLACK COLOR"+cgr+"\nGRAY COLOR"+cw+"\nWHITE COLOR");
 				break;
 				case 'time':	// Show time Between 2 events
-					if(y==undefined||z==undefined){say(cp+"!ar time "+cy+"[time2] [time1]");break;}
+					if(y==undefined||z==undefined){say(cp+"!mm time "+cy+"[time2] [time1]");break;}
 					elapsed(y, z);
+				break;
+/*Lanc Blk Del*/case 'ss':
+					if(y==undefined){say(cp+"!mm ss "+cy+"[skill id]");break;}
+					startSkill(y);say(cp+"Trying ss "+cy+y);
+				break;
+/*Lanc Blk Del*/case 'ps':
+					if(y==undefined){say(cp+"!mm ps "+cy+"[skill id]");break;}
+					pressSkill(y);say(cp+"Trying ps "+cy+y);
+				break;
+/*Lanc Blk Del*/case 'fs':
+					fakeS = !fakeS;say(cp+"Fake Skills " + (fakeS ? 'Activated':'Deactivated'));
+				break;
+/*Lanc Blk Del*/case 'lbd':
+					if(y==undefined){say(cp+"!mm lbd "+cy+"[delay]");break;}
+					lbd=y;say(cp+"Lancer Block delay set to "+cy+lbd);
+				break;
+/*Lanc AA  Del*/case 'lad':
+					if(y==undefined){say(cp+"!mm lad "+cy+"[delay]");break;}
+					lad=y;say(cp+"Lancer AutoAttack delay set to "+cy+lad);
 				break;
 				case 'catch':	// Catch skill id and type
 					say("Use skill now", "#00FF00");isCatch=true;
 				break;
 /*New skill*/	case 'snew': // Add New skill with id=y, name=z
-					if(y==undefined||z==undefined||a==undefined||b==undefined||c==undefined||d==undefined){say("!ar snew [id] [name] [type] [priority] [cast time] [cd]", "#FF00FF");break;}
+					if(y==undefined||z==undefined||a==undefined){say(cp+"!mm snew"+cy+" [id] [name] [type]"+cb+" [priority=0] [cast time=0] [cd=0]");break;}
 					//check: if ID is not already exist
-					dontDoIt=false;if(y=="cat")y=catId;if(a=="cat")a=catType;
+					dontDoIt=false;if(y=="cat")y=catId;if(a=="cat")a=catType;if(b==undefined)b=0;if(c==undefined)c=0;if(d==undefined)d=0;
 					if(config[cClass][0]!=undefined && config[cClass][0]!=null) //IF class have atleast 1 skill defined
 					{
 						for(let i=0;i<config[cClass].length;i++)
 						{
-							if(config[cClass][i][0]==y){say('Skill with this id already exists in Number \"'+i+'\" Skill, use command !ar sedit instead', "#FF0000");dontDoIt=true;}
+							if(config[cClass][i][0]==y){say('Skill with this id already exists in Number \"'+i+'\" Skill, use command !mm sedit instead', "#FF0000");dontDoIt=true;}
 						}
 					}
 					if(!dontDoIt){
@@ -279,7 +319,7 @@ module.exports = function Macro(dispatch) {
 					}
 				break;
 /*Edit Skill*/	case 'sedit': // Edit skill with id "y"
-					if(y==undefined||z==undefined){say("!ar sedit [id] [name] [type] [priority] [cast time] [cd] | use [-] to skip argument", "#FF00FF");break;}
+					if(y==undefined||z==undefined){say(cp+"!mm sedit "+cy+"[id]"+cb+" [name] [type] [priority] [cast time] [cd] | use [-] to skip argument");break;}
 					//check: if ID is not already exist
 					dontDoIt=false;if(y=="cat")y=catId;if(a=="cat")a=catType;
 					if(config[cClass][0]!=undefined && config[cClass][0]!=null) //IF class have atleast 1 skill defined
@@ -306,7 +346,7 @@ module.exports = function Macro(dispatch) {
 					if(!dontDoIt)say("Skill with id \""+y+"\" didn't found", "#FF0000");
 				break;
 /*SkillDelete*/	case 'sdel':	// Delete skill with id "y"
-					if(y==undefined){say("!ar sdel [id]", "#FF00FF");break;}
+					if(y==undefined){say("!mm sdel [id]", "#FF00FF");break;}
 					dontDoIt=false;if(y=="cat")y=catId;
 					if(config[cClass][0]!=undefined && config[cClass][0]!=null) //IF class have atleast 1 macro defined
 					{
@@ -338,8 +378,8 @@ module.exports = function Macro(dispatch) {
 //|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 //|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 /*New Macro*/	case 'mnew':	// Add New Macro with triggering skill id=y, name=z...
-					if(y==undefined||z==undefined||a==undefined||b==undefined){say("!ar mnew [id] [name] [type(s|p|r|as|ae|esr|abnb|abne|cd)] [isloop]", "#FF00FF");break;}
-					dontDoIt=false;if(y=="cat")y=catId;if(a=="cat")a=catType;
+					if(y==undefined||z==undefined||a==undefined){say(cp+"!mm mnew "+cy+"[id] [name] [type(s|p|r|as|ae|esr|abnb|abne|cd)]"+cb+" [isloop=0]");break;}
+					dontDoIt=false;if(y=="cat")y=catId;if(a=="cat")a=catType;if(b==undefined)b=0;
 					if(config[cRot][0]!=undefined && config[cRot][0]!=null) //IF class have atleast 1 Macro defined
 					{
 						for(let i=0;i<config[cRot].length;i++)
@@ -358,13 +398,13 @@ module.exports = function Macro(dispatch) {
 						if(isNaN(a)){
 							switch (a) {
 							case 's':
-								config[cRot][cRotNum][2]=0;//TYPE
+								config[cRot][cRotNum][2]=cstart;//TYPE
 							break;
 							case 'p':
-								config[cRot][cRotNum][2]=1;
+								config[cRot][cRotNum][2]=cpress;
 							break;
 							case 'r':
-								config[cRot][cRotNum][2]=2;
+								config[cRot][cRotNum][2]=crelease;
 							break;
 							case 'as':
 								config[cRot][cRotNum][2]=3;
@@ -392,7 +432,7 @@ module.exports = function Macro(dispatch) {
 					}
 				break;
 /*EditMacro*/	case 'medit':	// Edit Macro with name "z"...
-					if(y==undefined||z==undefined){say("!ar medit [id] [name] [type(s|p|r|as|ae|esr|abnb|abne|cd)] [isloop] | use [-] to skip argument", "#FF00FF");break;}
+					if(y==undefined||z==undefined){say("!mm medit [id] [name] [type(s|p|r|as|ae|esr|abnb|abne|cd)] [isloop] | use [-] to skip argument", "#FF00FF");break;}
 					dontDoIt=false;if(y=="cat")y=catId;if(a=="cat")a=catType;
 					if(config[cRot][0]!=undefined && config[cRot][0]!=null) //IF class have atleast 1 Macro defined
 					{
@@ -403,15 +443,16 @@ module.exports = function Macro(dispatch) {
 								dontDoIt=true;
 								if(y!='-')config[cRot][i][0]=y;//ID
 								if(isNaN(a)){
+									if(a!="-" && a!=undefined)
 									switch (a) {
 									case 's':
-										config[cRot][i][2]=0;//TYPE
+										config[cRot][i][2]=cstart;//TYPE
 									break;
 									case 'p':
-										config[cRot][i][2]=1;
+										config[cRot][i][2]=cpress;
 									break;
 									case 'r':
-										config[cRot][i][2]=2;
+										config[cRot][i][2]=crelease;
 									break;
 									case 'as':
 										config[cRot][i][2]=3;
@@ -431,10 +472,6 @@ module.exports = function Macro(dispatch) {
 									case 'cd':
 										config[cRot][i][2]=8;
 									break;
-									case '-':// DIDN'T CHANGED
-									break;
-									case undefined:// DIDN'T CHANGED
-									break;
 									}
 								}else{config[cRot][i][2]=a;}
 								if(b!='-'&&b!=undefined)config[cRot][i][3]=b;//ISLOOP
@@ -449,7 +486,7 @@ module.exports = function Macro(dispatch) {
 					}
 				break;
 /*NameMacro*/	case 'mname':	// Rename Macro with name "y"...
-					if(y==undefined||z==undefined){say("!ar mname [old name] [new name]", "#FF00FF");break;}
+					if(y==undefined||z==undefined){say("!mm mname [old name] [new name]", "#FF00FF");break;}
 					dontDoIt=false;
 					if(config[cRot][0]!=undefined && config[cRot][0]!=null) //IF class have atleast 1 Macro defined
 					{
@@ -470,7 +507,7 @@ module.exports = function Macro(dispatch) {
 					}
 				break;
 /*AddToMacro*/	case 'madd':	// Add event to Macro with name "y"
-					if(y==undefined||z==undefined||a==undefined||b==undefined){say("!ar madd [name] [type(s|p|r|as|ae|esr|abnb|abne|cd)] [id] [delay]", "#FF00FF");break;}
+					if(y==undefined||z==undefined||a==undefined||b==undefined){say("!mm madd [name] [type(s|p|r|as|ae|esr|abnb|abne|cd)] [id] [delay]", "#FF00FF");break;}
 					dontDoIt=false;if(a=="cat")a=catId;if(z=="cat")z=catType;
 					if(config[cRot][0]!=undefined && config[cRot][0]!=null) //IF class have atleast 1 Macro defined
 					{
@@ -528,7 +565,7 @@ module.exports = function Macro(dispatch) {
 					}
 				break;
 /*EditAddMacro*/case 'maddedit':	// Edit Added event to Macro with name "y"
-					if(y==undefined){say("!ar maddedit [name] [type(s|p|r|as|ae|esr|abnb|abne|cd)] [id] [delay] [index] | use [-] to skip argument", "#FF00FF");break;}
+					if(y==undefined){say("!mm maddedit [name] [type(s|p|r|as|ae|esr|abnb|abne|cd)] [id] [delay] [index] | use [-] to skip argument", "#FF00FF");break;}
 					dontDoIt=false;if(a=="cat")a=catId;if(z=="cat")z=catType;
 					if(config[cRot][0]!=undefined && config[cRot][0]!=null) //IF class have atleast 1 Macro defined
 					{
@@ -602,7 +639,7 @@ module.exports = function Macro(dispatch) {
 					}else{say("No Macros for current Class in config", "#FF0000");}
 				break;
 /*MacroDetails*/case 'minfo':	// List details of macro with name "y"
-					if(y==undefined){say("!ar minfo [name]", "#FF00FF");break;}
+					if(y==undefined){say("!mm minfo [name]", "#FF00FF");break;}
 					dontDoIt=false;
 					if(config[cRot][0]!=undefined && config[cRot][0]!=null) //IF class have atleast 1 macro defined
 					{
@@ -624,7 +661,7 @@ module.exports = function Macro(dispatch) {
 					}
 				break;
 /*MacroDelete*/	case 'mdel':	// Delete macro with name "y"
-					if(y==undefined){say("!ar mdel [name]", "#FF00FF");break;}
+					if(y==undefined){say("!mm mdel [name]", "#FF00FF");break;}
 					dontDoIt=false;
 					if(config[cRot][0]!=undefined && config[cRot][0]!=null) //IF class have atleast 1 macro defined
 					{
@@ -648,7 +685,7 @@ module.exports = function Macro(dispatch) {
 					say("config[cClass][x][y] = "+config[cClass][y][z], "#FF00FF");
 				break;
 /*MacroDelPart*/case 'madddel':	// Delete macro with name "y" and index "z"
-					if(y==undefined||z==undefined){say("!ar madddel [name] [index]", "#FF00FF");break;}
+					if(y==undefined||z==undefined){say("!mm madddel [name] [index]", "#FF00FF");break;}
 					dontDoIt=false;
 					if(config[cRot][0]!=undefined && config[cRot][0]!=null) //IF class have atleast 1 macro defined
 					{
@@ -681,43 +718,43 @@ module.exports = function Macro(dispatch) {
 					say("Config Saved", "#FF00FF");
 				break;
 				default:
-					say("command ar "+x+" didn't found", "#FF0000");
+					say("command mm "+x+" didn't found", "#FF0000");
 				break;
 			}
 		}
 	});
 	
-	dispatch.command.add('auro', (x) => {
+	dispatch.command.add('macro', (x) => {
 		if(x==undefined){//cr cg cb cdb clb/cy co/ cp clp /cv /cbl cgr cw
 dispatch.command.message(
 cp+"Commands:\n"
-+cg+"ar  "+cr+"Mod on/off\n"
-+cg+"auro help  "+cr+"instructions\n"
-+cg+"auro macro  "+cr+"show Macro commands\n"
-+cg+"auro skill  "+cr+"show Skills commands\n"
-+cg+"auro debug  "+cr+"Display skill/effects info on/off\n"
-+cg+"auro abn  "+cr+"Display Abnormality on/off\n"
-+cg+"ar catch  "+cr+"Catch ID and Type of skill\n"
-+cg+"ar time "+cp+"[x] [y]  "+cr+"Time = (x - y)"
++cg+"mm  "+cr+"Mod on/off\n"
++cg+"macro help  "+cr+"instructions\n"
++cg+"macro macro  "+cr+"show Macro commands\n"
++cg+"macro skill  "+cr+"show Skills commands\n"
++cg+"macro debug  "+cr+"Display skill/effects info on/off\n"
++cg+"macro abn  "+cr+"Display Abnormality on/off\n"
++cg+"mm catch  "+cr+"Catch ID and Type of skill\n"
++cg+"mm time "+cp+"[x] [y]  "+cr+"Time = (x - y)"
 );
 		}else if(x=='skill'){say("only Skills arguments Name and ID is used for displaying Names of skills instead of ID, other arguments currently completly useless and can be set to 0.","#FF0000");
 dispatch.command.message(cp+"If you catched skill - type "+cg+"cat "+cp+"instead of ID and Type\n"
-+cg+"ar snew "+cy+"[id] [name] [type] [priority] [cast time] [cd]  "+cr+"Write info about skill in config\n"
-+cg+"ar sedit "+cy+"[id] [name] [type] [priority] [cast time] [cd]  "+cr+"Edit by ID, use \"-\" to skip arguments\n"
-+cg+"ar slist  "+cr+"Lists all skills in config for current class"
++cg+"mm snew "+cy+"[id] [name] [type] [priority] [cast time] [cd]  "+cr+"Write info about skill in config\n"
++cg+"mm sedit "+cy+"[id] [name] [type] [priority] [cast time] [cd]  "+cr+"Edit by ID, use \"-\" to skip arguments\n"
++cg+"mm slist  "+cr+"Lists all skills in config for current class"
 );
 		}else if(x=='macro'){
 dispatch.command.message(
-cg+"ar mnew "+cy+"[Triggering skill id] [Name] [Triggering Type] [ISRepeat]  "+cr+"Creates new Macro\n"
-+cg+"ar medit "+cy+"[Triggering skill id] [Name] [Triggering Type] [ISRepeat]  "+cr+"Edit by Name, use [-] to skip argument\n"
-+cg+"ar mname "+cy+"[old name] [new name]  "+cr+"Rename Macro\n"
-+cg+"ar mdel "+cy+"[name]  "+cr+"Delete Macro\n"
-+cg+"ar madd "+cy+"[Name] [Triggering Type] [ID] [Delay]  "+cr+"Add Action to Macro\n"
-+cg+"ar maddedit "+cy+"[Name] [Triggering Type] [ID] [Delay] [index]  "+cr+"use [-] to skip argument\n"
-+cg+"ar madddel "+cy+"[name] [index]  "+cr+"Delete Macro Action at Index\n"
-+cg+"ar mlist  "+cr+"Lists all macros in config for current class\n"
-+cg+"ar minfo "+cy+"[name]  "+cr+"Show Macro Actions\n"
-+cg+"auro mnewinfo "+cr+"mnew arguments info"
+cg+"mm mnew "+cy+"[Triggering skill id] [Name] [Triggering Type] "+cb+"[ISRepeat]  "+cr+"Creates new Macro\n"
++cg+"mm medit "+cy+"[Triggering skill id] [Name] [Triggering Type] [ISRepeat]  "+cr+"Edit by Name, use [-] to skip argument\n"
++cg+"mm mname "+cy+"[old name] [new name]  "+cr+"Rename Macro\n"
++cg+"mm mdel "+cy+"[name]  "+cr+"Delete Macro\n"
++cg+"mm madd "+cy+"[Name] [Triggering Type] [ID] [Delay]  "+cr+"Add Action to Macro\n"
++cg+"mm maddedit "+cy+"[Name] [Triggering Type] [ID] [Delay] [index]  "+cr+"use [-] to skip argument\n"
++cg+"mm madddel "+cy+"[name] [index]  "+cr+"Delete Macro Action at Index\n"
++cg+"mm mlist  "+cr+"Lists all macros in config for current class\n"
++cg+"mm minfo "+cy+"[name]  "+cr+"Show Macro Actions\n"
++cg+"macro mnewinfo "+cr+"mnew arguments info"
 );
 		}else if(x=='abn'){
 			abnorm = !abnorm;say("Abnormality Display: " + (abnorm ? 'Enabled':'Disabled'),"#FF00FF");
@@ -727,19 +764,19 @@ cg+"ar mnew "+cy+"[Triggering skill id] [Name] [Triggering Type] [ISRepeat]  "+c
 			config[settings][2]=(testmode ? true : false);saveConfig();
 		}else if(x=='info' ||x=='help'){
 dispatch.command.message(cp+"How to create macro:\n"
-+cp+"1 > "+cg+"Enable Mod(command: "+cr+"!ar"
++cp+"1 > "+cg+"Enable Mod(command: "+cr+"!mm"
 +cg+")\n"
-+cp+"2 > "+cr+"!ar catch "+cg+"Now cast skill you want to use as Macro trigger\n"
-+cp+"3 > "+cr+"!ar mnew "+co+"cat Nyan cat 0\n"
-+cg+"Here we Created new Macro with name "+co+"Nyan "+cg+"and with catched("+co+"cat"+cg+") ID and Type of skill\n"
++cp+"2 > "+cr+"!mm catch "+cg+"Now cast skill you want to use as Macro trigger\n"
++cp+"3 > "+cr+"!mm mnew "+cb+"cat"+co+" Nyan "+cb+"cat\n"
++cg+"Here we Created new Macro with name "+co+"Nyan "+cg+"and with catched("+cb+"cat"+cg+") ID and Type of skill\n"
 +cp+"4 > "
-+cg+"To get skill cast time - enable skills info - "+cr+"!auro debug\n"
++cg+"To get skill cast time - enable skills info - "+cr+"!macro debug\n"
 +cp+"5 > "+cg+"Now again cast skill you used as trigger, and after - cast any other skill as fast, as possible\n"
 +cp+"6 > "+cg+"You will see message like this:\n"
 +cb+"T4: C_START_SKILL... \n"
-+cg+"Digit ("+cb+"4 "+cg+"in our example) will be used to get time from 1st to 2nd Skill cast: "+cr+"!ar time "+cy+"[2nd] [1st]\n"
-+cp+"7 > "+cg+"Catch 2nd Skill: "+cr+"!ar catch "+cg+"Now use "+cb+"Time"+cg+" you got at "+cp+"step 6 "+cg+"as Delay to Add Action to your Macro: "+cr+"!ar madd "+co+"Nyan cat cat "+cb+"Time\n"
-+cg+"Now try to trigger your skill. If you did all right - you will see 2nd skill Activating. If 2nd hit too early - increace "+cb+"Time"+cg+", or decreace if you want. This way you can add as many Skills as you want and see all things you added by using command "+cr+"!ar minfo "+cg+"and "+cr+"!ar mlist"
++cg+"Digit ("+cb+"4 "+cg+"in our example) will be used to get time from 1st to 2nd Skill cast: "+cr+"!mm time "+cy+"[2nd] [1st]\n"
++cp+"7 > "+cg+"Catch 2nd Skill: "+cr+"!mm catch "+cg+"Now use "+cb+"Time"+cg+" you got at "+cp+"step 6 "+cg+"as Delay to Add Action to your Macro: "+cr+"!mm madd "+co+"Nyan"+cb+" cat cat "+cb+"Time\n"
++cg+"Now try to trigger your skill. If you did all right - you will see 2nd skill Activating. If 2nd hit too early - increace "+cb+"Time"+cg+", or decreace if you want. This way you can add as many Skills as you want and see all things you added by using command "+cr+"!mm minfo "+cg+"and "+cr+"!mm mlist"
 );
 		}else if(x=='mnewinfo'){
 					say("mnew x = skill that trigger Macro\n"+
@@ -748,6 +785,7 @@ dispatch.command.message(cp+"How to create macro:\n"
 					"Arg: s - C_START_SKILL\n"+
 					"Arg: p - C_PRESS_SKILL(PRESS)\n"+
 					"Arg: r - C_PRESS_SKILL(RELEASE)\n"+
+					"Arg: st - C_START_TARGETED_SKILL\n"+
 					"Arg: as - S_ACTION_STAGE\n"+
 					"Arg: ae - S_ACTION_END\n"+
 					"Arg: esr - S_EACH_SKILL_RESULT\n"+
@@ -756,7 +794,7 @@ dispatch.command.message(cp+"How to create macro:\n"
 					"Arg: cd - S_START_COOLTIME_SKILL\n"+
 					"Arg: s - C_START_SKILL\n"+
 					"a = Repeat after end: 0 - no, 1 - yes\n"+
-					"Example: !ar mnew 111100 lightstrike s 0\n"
+					"Example: !mm mnew 111100 lightstrike s 0\n"
 					, "#FF00FF");
 		}
 	});
@@ -780,6 +818,12 @@ dispatch.command.message(cp+"How to create macro:\n"
 			if(config[rot][rnum][indx+3]!=undefined){execute(rot,rnum,indx+3);}//continue executing
 			},
 			config[rot][rnum][indx+2]);//Delay
+		}else
+		if(config[rot][rnum][indx]==9) {//TYPE Dash
+			setTimeout(() => {targetedSkill(config[rot][rnum][indx+1]);
+			if(config[rot][rnum][indx+3]!=undefined){execute(rot,rnum,indx+3);}//continue executing
+			},
+			config[rot][rnum][indx+2]);//Delay
 		}
 	}
 	
@@ -789,6 +833,9 @@ dispatch.command.message(cp+"How to create macro:\n"
 		if(isCatch){isCatch=false;catId=a;catType=b;say(cb+"cat"+cp+"ched! Id "+cb+a+cp+", Type "+cb+b);}
 		if(bait)
 		{
+			if(a==lb){if(b==2){lpa=false;releaseSkill(lb);lm();say("Macro Lancer try to continue..");
+				}else{if(b==1){lpa=true;say("Macro Lancer try to pause..");
+			}}}
 			for(let i=0;i<config[cRot].length;i++)// i=index rotacii, i[0]=triggering skill
 			{
 				if(config[cRot][i][0]==a)
@@ -847,7 +894,7 @@ dispatch.command.message(cp+"How to create macro:\n"
 				forSetClass(brawler);
 			break;
 			case 0:
-				forSetClass(priest);
+				forSetClass(warrior);
 			break;
 			case 3:
 				forSetClass(berserker);
@@ -881,18 +928,76 @@ dispatch.command.message(cp+"How to create macro:\n"
 	
 	// Called when item used
 	dispatch.hook('C_USE_ITEM', 3, event => {
-		if(enabled && (event.id==206004 || event.id==206003 || event.id==206002 || event.id==206001 || event.id==206000))
+		if(enabled && (event.id==206004 || event.id==206003 || event.id==206002 || event.id==206001 || event.id==206000 || event.id==206005 || event.id==206006 || event.id==206007 || event.id==206008 || event.id==206009))
 		{
-			//bait = !bait;say("Macro " + (bait ? 'Enabled':'Paused'), "#FF00FF");
-			
-			//setTimeout(startSkill(argskillid), (bto));//bto - Bait>Skill Timeout
-			//setTimeout(sendAttack, (timeout));
+			if(event.id==206004 || event.id==206003 || event.id==206002 || event.id==206001 || event.id==206000){
+				lpa=false;
+				bait = !bait;say("Macro " + (bait ? 'Enabled':'Paused'), "#FF00FF");
+				if(!bait)lc=0;
+				//if(config[settings][0]==lancer)
+					setTimeout(() => {lm()},200)
+			}else
+			if(event.id==206005){// RED WORM BAIT
+				if(!lpa){lpa=true;say("Macro Lancer block..");}else
+				{lpa=false;releaseSkill(lb);lm();say("Macro Lancer continue..");}
+			}else
+			if(event.id==206006){// GREEN WORM BAIT
+				if(bait){laDodge=true;lpa=true;say("Macro Lancer dodge..");}
+				else{startSkill(260100);}
+				//setTimeout(() => {laDodge=false;lpa=false;releaseSkill(lb);lm();say("Macro Lancer continue..");},500)
+			}
 		}
 	});
+	//block delay: lbd:
+	/*
+		80 malo dlya bez cdr i s crit etch
+		90 - norm
+	*/
+	// autoattack id=laa 
+	//Lancer block barrage Macro
+	lbd=90;//block delay
+	function lm(){
+		if(bait&&(!lpa)&&(!laDodge)){
+			startSkill(lba2);
+			lc++;
+			setTimeout(() => {pressSkill(lb);releaseSkill(lb);if(true){lm()}else//if ----lc<=1
+			{
+				
+				pressSkill(lb);
+				lc=0;
+			}},lbd)
+		}else
+		if(lpa&&(!laDodge)){pressSkill(lb)}else
+		if(laDodge){startSkill(260100);laDodge=false;bait = false;}
+	}
 	
+	
+	
+	//Class Test
+	function la(){
+		if(bait){pressSkill(320100);
+			//pressSkill(320100);releaseSkill(320100);
+			//setTimeout(() => {la()},lad)
+			
+			//startSkill(191101);
+			lc++;
+			setTimeout(() => {//releaseSkill(320100);
+			if(true){la()}else//if ----lc<=0
+			{
+				lc=0;
+			}},lad)
+		}
+	}
+	
+    dispatch.hook('C_START_COMBO_INSTANT_SKILL', 4, ONLY_USER_HOOK, event => {
+		targets=event.targets;
+		endpoints=event.endpoints;
+		if(enabled){eve(event.skill.id,15);getTime();debug(cg+'T'+timeid+': C_START_COMBO_INSTANT_SKILL(User): ' + event.skill.id);}
+    });
 	// Called when you start skill
     dispatch.hook('C_START_SKILL', 7, ONLY_USER_HOOK, event => {
-		if(enabled){eve(event.skill.id,0);getTime();debug('T'+timeid+': C_START_SKILL(User): ' + event.skill.id, "#0077FF");}
+		eTarget=event.target;
+		if(enabled){if(fakeS){pressSkill(event.skill.id);return false}eve(event.skill.id,0);getTime();debug('T'+timeid+': C_START_SKILL(User): ' + event.skill.id, "#0077FF");}
     });
 	
 	// Called when you press/release skill
@@ -906,15 +1011,15 @@ dispatch.command.message(cp+"How to create macro:\n"
 	
 	// Called when????????????????? C_START_TARGETED_SKILL
 	dispatch.hook('C_START_TARGETED_SKILL', 6, ONLY_USER_HOOK, event => {
-		if(enabled){eve(event.skill,668);getTime();debug(cr+'T'+timeid+': C_START_TARGETED_SKILL(User): ' + event.skill);}
+		if(enabled){eve(event.skill.id,9);getTime();debug(cr+'T'+timeid+': C_START_TARGETED_SKILL(User): ' + event.skill.id);}
     });
 	// Called when????????????????? C_START_TARGETED_SKILL
 	dispatch.hook('C_START_INSTANCE_SKILL', 5, ONLY_USER_HOOK, event => {
-		if(enabled){eve(event.skill,666);getTime();debug(cr+'T'+timeid+': C_START_INSTANCE_SKILL(User): ' + event.skill);}
+		if(enabled){eve(event.skill.id,10);getTime();debug(cr+'T'+timeid+': C_START_INSTANCE_SKILL(User): ' + event.skill.id);}
     });
 	// Called when?????????????????
 	dispatch.hook('S_CANNOT_START_SKILL', 4, ONLY_USER_HOOK, event => {
-		if(enabled){eve(event.skill,667);getTime();debug(cr+'T'+timeid+': S_CANNOT_START_SKILL(User): ' + event.skill);}
+		if(enabled){eve(event.skill.id,11);getTime();debug(cr+'T'+timeid+': S_CANNOT_START_SKILL(User): ' + event.skill.id);}
     });
 	
 	// Called when??? can i use it to disable or fake anything?..
@@ -972,13 +1077,13 @@ dispatch.command.message(cp+"How to create macro:\n"
 	dispatch.hook('S_START_COOLTIME_SKILL', 3, (event)=>{ 
 		if(enabled)
 		{
-			eve(event.skill.id,3);	//CHANGE IT LATER!!
+			eve(event.skill.id,8);	//CHANGE IT LATER!!
 			if(nocooldown){
 				//event.skillid
 				event.cooldown=0;return true; //disable client cd
 			}
 		}
-	});	
+	});
 	
 	//$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 	//GETTING INFO////GETTING INFO////GETTING INFO////GETTING INFO////GETTING INFO////GETTING INFO////GETTING INFO//
@@ -1010,8 +1115,19 @@ dispatch.command.message(cp+"How to create macro:\n"
 	//FUNCTIONS////FUNCTIONS////FUNCTIONS////FUNCTIONS////FUNCTIONS////FUNCTIONS////FUNCTIONS////FUNCTIONS////FUNCTIONS//
 	//###################################################################################################################
 	
+	function comboSkill(argskillid,targ=0) {
+		getTime();
+		dispatch.toServer('C_START_COMBO_INSTANT_SKILL', 4, {
+			skill: { reserved: 0, npc: false, type: 1, huntingZoneId: 0, id: argskillid },
+			loc: loc,
+			w: w,
+			targets: targets,
+			endpoints: endpoints
+		});
+		debug('T'+timeid+': C_START_COMBO_INSTANT_SKILL(Code): ' + argskillid, "#FF00FF");
+	}
 	// For 1-hit skills
-	function startSkill(argskillid) {
+	function startSkill(argskillid, targ=0) {
 		getTime();
 		dispatch.toServer('C_START_SKILL', 7, {
 			skill: { reserved: 0, npc: false, type: 1, huntingZoneId: 0, id: argskillid },
@@ -1020,7 +1136,7 @@ dispatch.command.message(cp+"How to create macro:\n"
 			dest: { x: 0, y: 0, z: 0 },
 			unk: true,
 			moving: false,
-			target: 0, //{ low: 0, high: 0, unsigned: true },
+			target: targ, //{ low: 0, high: 0, unsigned: true },
 			unk2: false
 		});
 		debug('T'+timeid+': C_START_SKILL(Code): ' + argskillid, "#FF00FF");
@@ -1046,6 +1162,18 @@ dispatch.command.message(cp+"How to create macro:\n"
 			w: w
 		});
 		debug('T'+timeid+': C_PRESS_SKILL(Code) \"R\": ' + argskillid, "#FF00FF");
+	}
+	//antoher type of skills
+	function targetedSkill(argskillid) { //DASH like skills
+		getTime();
+		dispatch.toServer('C_START_TARGETED_SKILL', 6, {
+			skill: { reserved: 0, npc: false, type: 1, huntingZoneId: 0, id: argskillid },
+			loc: loc,
+			w: w,
+			dest: loc,
+			targets: {id: "0", unk:0}
+		});
+		debug('T'+timeid+': C_START_TARGETED_SKILL(Code): ' + argskillid, "#FF00FF");
 	}
 	
 	// Time calculation
@@ -1095,8 +1223,8 @@ dispatch.command.message(cp+"How to create macro:\n"
 	}
 	
 	this.destructor = function() {
-		dispatch.command.remove('ar');
-		dispatch.command.remove('auro');
+		dispatch.command.remove('mm');
+		dispatch.command.remove('macro');
 		delete require.cache[require.resolve('./config.json')];//   ./_config.json
 	}
 }
