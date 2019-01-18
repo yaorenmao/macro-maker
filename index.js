@@ -776,7 +776,7 @@ dispatch.command.message(cp+"How to create macro:\n"
 +cb+"T3: C_START_SKILL... \n"
 +cb+"T4: C_START_SKILL... \n"
 +cg+"Digits next to T ("+cb+"4 "+cg+"in our example) will be used to get time from 1st to 2nd Skill cast: "+cr+"!mm time "+cy+"[2nd] [1st] (our example: mm time 4 3)\n"
-+cp+"7 > "+cg+"Catch 2nd Skill: "+cr+"!mm catch "+cg+"Now use "+cb+"Time"+cg+" you got at "+cp+"step 6 "+cg+"as Delay to Add Action to your Macro: "+cr+"!mm madd "+co+"Nyan"+cb+" cat cat "+cb+"Time\n"
++cp+"7 > "+cg+"Catch 2nd Skill: "+cr+"!mm catch "+cg+"Now use "+cb+"Time"+cg+" you got at "+cp+"step 6 "+cg+"as Delay to Add Action to your Macro: "+cr+"!mm madd "+co+"Nyan"+cb+" (cat)TYPE (cat)ID "+cb+"Time (example: !mm madd Nyan 0 2305648 800)\n"
 +cg+"Now try to trigger your skill. If you did all right - you will see 2nd skill Activating. If 2nd hit too early - increace "+cb+"Time"+cg+", or decreace if you want. This way you can add as many Skills as you want and see all things you added by using command "+cr+"!mm minfo "+cg+"and "+cr+"!mm mlist"
 );
 		}else if(x=='mnewinfo'){
